@@ -1,0 +1,31 @@
+name: Local CI/CD to Docker Desktop
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_push_deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t localhost:5000/hello-app:${{ github.sha }} ./app
+          docker tag localhost:5000/hello-app:${{ github.sha }} localhost:5000/hello-app:latest
+
+      - name: Push image to local registry
+        run: |
+          docker push localhost:5000/hello-app:${{ github.sha }}
+          docker push localhost:5000/hello-app:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/
+          kubectl set image deployment/hello-app hello-app=localhost:5000/hello-app:${{ github.sha }}
+          kubectl set env deployment/hello-app APP_VERSION=${{ github.sha }}
+          kubectl rollout status deployment/hello-app
