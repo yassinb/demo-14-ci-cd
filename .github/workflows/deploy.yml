@@ -28,4 +28,5 @@ jobs:
           kubectl apply -f k8s/
           kubectl set image deployment/hello-app hello-app=localhost:5000/hello-app:${{ github.sha }}
           kubectl set env deployment/hello-app APP_VERSION=${{ github.sha }}
+          kubectl annotate deployment/hello-app kubernetes.io/change-cause="Deploy ${{ github.event.head_commit.message }}" --overwrite
           kubectl rollout status deployment/hello-app
