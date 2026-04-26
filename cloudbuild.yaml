@@ -13,7 +13,7 @@ steps:
       - 'push'
       - 'europe-west1-docker.pkg.dev/$PROJECT_ID/mooc-containers/mooc-web:$SHORT_SHA'
 
-  # 3. Déployer sur Cloud Run
+  # 3. Déployer l'image sur Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
@@ -32,3 +32,6 @@ steps:
 
 images:
   - 'europe-west1-docker.pkg.dev/$PROJECT_ID/mooc-containers/mooc-web:$SHORT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
